@@ -150,7 +150,7 @@ const Onboarding = () => {
             <View className="flex flex-row gap-5">
               <TouchableOpacity
                 className="bg-blue-600 rounded-lg py-4 items-center flex-1"
-                onPress={() => router.push('/ApplicantSignUp')}
+                onPress={() => router.navigate('/ApplicantSignUp')}
               >
                 <Text
                   className="text-white font-semibold text-lg"
@@ -161,7 +161,7 @@ const Onboarding = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 className="bg-gray-200 rounded-lg py-4 items-center flex-1"
-                onPress={() => router.push('/SignIn')}
+                onPress={() => router.navigate('/SignIn')}
               >
                 <Text
                   className="text-blue-600 font-semibold text-lg"

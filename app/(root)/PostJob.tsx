@@ -22,7 +22,6 @@ const PostJob = () => {
   const [title, setTitle] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [description, setDescription] = useState('');
-  const [jobType, setJobType] = useState('');
   const [contactInfo, setContactInfo] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [skillInput, setSkillInput] = useState('');
@@ -143,13 +142,13 @@ const PostJob = () => {
       const response = await createJob({
         title,
         requirements: skills,
-        location,
-        salary,
+        location: city ? `${city}, ${country?.name}` : country?.name || '',
+        salary: salaryMode === 'single' ? salary : `${minSalary} - ${maxSalary}`,
         description,
         recruiterId: currentUserId,
         companyName,
-        jobType: jobType,
-        deadline,
+        jobType: jobTypes,
+        deadline: deadline,
       });
 
       console.log('Job created:', response);

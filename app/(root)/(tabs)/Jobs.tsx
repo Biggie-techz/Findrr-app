@@ -193,7 +193,7 @@ const JobCard = ({
 
       <TouchableOpacity
         className="bg-gray-100 rounded-xl py-3 px-4 items-center"
-        onPress={() => router.push(`/jobs/${job.id}`)}
+        onPress={() => router.navigate(`/jobs/${job.id}`)}
       >
         <Text className="text-gray-900 font-rubik-medium">View</Text>
       </TouchableOpacity>

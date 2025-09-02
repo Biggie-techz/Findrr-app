@@ -3,6 +3,7 @@ import {
   getCurrentUser,
   googleLogin,
 } from '@/lib/appwrite';
+import { useGlobalContext } from '@/lib/global-provider';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -21,6 +22,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SignIn = () => {
+  const { refetch } = useGlobalContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -31,7 +33,7 @@ const SignIn = () => {
       const user = await getCurrentUser();
       if (user) {
         // Already logged in => redirect to homepage
-        router.push('/(root)/(tabs)');
+        router.navigate('/(root)/(tabs)');
       } else {
         // Not logged in => stay on onboarding
         console.log('No active session');
@@ -57,7 +59,8 @@ const SignIn = () => {
       console.log('Sign in with:', email, password);
       const result = await emailPasswordLogin(email, password);
       if (result.success) {
-        router.push('/(root)/(tabs)');
+        await refetch();
+        router.navigate('/(root)/(tabs)');
       } else {
         Alert.alert('Error', 'Failed to sign in. Please try again.');
       }
@@ -77,7 +80,8 @@ const SignIn = () => {
     setLoading(true);
     const result = await googleLogin();
     if (result) {
-      router.push('/(root)/(tabs)');
+      await refetch();
+      router.navigate('/(root)/(tabs)');
     } else {
       Alert.alert('Error', 'Failed to sign in. Please try again.');
     }

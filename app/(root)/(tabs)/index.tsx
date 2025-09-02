@@ -1,4 +1,4 @@
-import { fetchRecruiterJobs, getCurrentUser } from '@/lib/appwrite';
+import { fetchAllJobs, fetchRecruiterJobs, getCurrentUser } from '@/lib/appwrite';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -13,8 +13,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGlobalContext } from '../../../lib/global-provider';
 
-// Mock data for recommended jobs
-const recommendedJobs = [
+// Mock data for recommended jobs (fallback)
+const mockRecommendedJobs = [
   {
     id: 1,
     title: 'Frontend Developer',
@@ -131,11 +131,11 @@ const recruiterQuickActions = [
   },
 ];
 
-const JobCard = ({ job }: { job: (typeof recommendedJobs)[0] }) => (
+const JobCard = ({ job }: { job: any }) => (
   <View className="bg-white rounded-xl p-4 mr-4 shadow-sm border border-gray-100 min-w-[280px]">
     <View className="flex-row items-center mb-3">
       <Image
-        source={job.logo}
+        source={job.logo || require('../../../assets/images/logo.png')}
         className="w-12 h-12 border border-gray-100 bg-gray-50 rounded-full mr-3"
         resizeMode="contain"
       />
@@ -143,32 +143,32 @@ const JobCard = ({ job }: { job: (typeof recommendedJobs)[0] }) => (
         <Text className="text-lg font-rubik-bold text-gray-900">
           {job.title}
         </Text>
-        <Text className="text-gray-600 font-rubik">{job.company}</Text>
+        <Text className="text-gray-600 font-rubik">{job.companyName}</Text>
       </View>
     </View>
-    <View className="space-y-2">
+    <View className="flex flex-col gap-2">
       <View className="flex-row items-center">
-        <Ionicons name="location" size={16} color="#6B7280" />
+        <Ionicons name="location-outline" size={16} color="#6B7280" />
         <Text className="text-gray-600 text-sm ml-2 font-rubik">
-          {job.location}
+          {job.location} {job.jobType ? `• ${job.jobType.join(', ')}` : ''}
         </Text>
       </View>
       <View className="flex-row items-center">
-        <Ionicons name="cash" size={16} color="#6B7280" />
+        <Ionicons name="cash-outline" size={16} color="#6B7280" />
         <Text className="text-gray-600 text-sm ml-2 font-rubik">
           {job.salary}
         </Text>
       </View>
       <View className="flex-row items-center">
-        <Ionicons name="time" size={16} color="#6B7280" />
+        <Ionicons name="time-outline" size={16} color="#6B7280" />
         <Text className="text-gray-600 text-sm ml-2 font-rubik">
-          {job.posted}
+          {job.createdAt || 'Recently'}
         </Text>
       </View>
     </View>
     <TouchableOpacity
       className="bg-blue-600 rounded-lg py-2 px-4 mt-4"
-      onPress={() => router.push(`/jobs/${job.id}`)}
+      onPress={() => router.navigate(`/jobs/${job.id || job.jobId}`)}
     >
       <Text className="text-white text-center font-rubik-medium">
         Apply Now
@@ -226,25 +226,40 @@ const QuickActionCard = ({ action }: { action: any }) => {
 
 export default function Index() {
   const { user } = useGlobalContext();
-  const [pageLoading, setPageLoading] = useState(true);
-  const [myJobs, setMyJobs] = useState<string[]>([]);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [myJobs, setMyJobs] = useState<any[]>([]);
+  const [recommendedJobs, setRecommendedJobs] = useState<any[]>(mockRecommendedJobs);
 
   useEffect(() => {
     const checkUser = async () => {
-      const result = await getCurrentUser();
-      
-      const userId = result.profile.$id;
-      
-      const jobs = await fetchRecruiterJobs(userId);
-      // setMyJobs(jobs);
-      console.log(jobs);
-      
-      if (!result) {
-        // Already logged in → redirect to homepage
-        router.push('/Onboarding');
-      } else {
-        console.log('No active session');
-        console.log(result.profile);
+      setPageLoading(true);
+      try {
+        const result = await getCurrentUser();
+
+        if (!result) {
+          router.navigate('/Onboarding');
+          return;
+        }
+
+        console.log(result);
+        
+
+        const userId = result.$id;
+
+        console.log(userId);
+        
+
+        if (user?.userType === 'recruiter') {
+          const jobs = await fetchRecruiterJobs(userId);
+          setMyJobs(jobs);
+        } else if (user?.userType === 'applicant') {
+          const allJobs = await fetchAllJobs();
+          setRecommendedJobs(allJobs.slice(0, 3));
+        }
+
+        setPageLoading(false);
+      } catch (error) {
+        console.error('Error loading user or jobs:', error);
         setPageLoading(false);
       }
     };
@@ -279,7 +294,7 @@ export default function Index() {
                 {user?.name || 'Ayonitemi!'}
               </Text>
             </View>
-            {user?.profile.avatar ? (
+            {/* {user?.profile.avatar ? (
               <Image
                 source={{ uri: user?.profile.avatar }}
                 className="w-12 h-12 border border-gray-100 bg-gray-50 rounded-full"
@@ -289,7 +304,7 @@ export default function Index() {
               <View className="bg-gray-100 p-2 rounded-full">
                 <Ionicons name="person" size={25} color="#374151" />
               </View>
-            )}
+            )} */}
           </View>
         </View>
 
@@ -332,8 +347,8 @@ export default function Index() {
                 className="pb-4"
               >
                 <View className="flex-row">
-                  {recommendedJobs.map((job) => (
-                    <JobCard key={job.id} job={job} />
+                  {recommendedJobs.map((job, index) => (
+                    <JobCard key={index} job={job} />
                   ))}
                 </View>
               </ScrollView>
@@ -366,13 +381,13 @@ export default function Index() {
             </Text>
             <View className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
               <Text className="font-rubik-medium text-gray-900">
-                Total Jobs Posted: 10
+                Total Jobs Posted: {myJobs.length}
               </Text>
               <Text className="font-rubik-medium text-gray-900">
-                Jobs Filled: 5
+                Jobs Filled: 0
               </Text>
               <Text className="font-rubik-medium text-gray-900">
-                Jobs Open: 5
+                Jobs Open: {myJobs.length}
               </Text>
             </View>
           </View>

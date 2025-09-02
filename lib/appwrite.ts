@@ -316,7 +316,7 @@ export async function createJob(jobData: {
   description: string;
   recruiterId: string;
   companyName: string;
-  jobType: string;
+  jobType: string[];
   deadline: Date | null;
 }) {
   try {
@@ -353,8 +353,8 @@ export async function createJob(jobData: {
 export async function fetchRecruiterJobs(userId: string) {
   try {
     const response = await databases.listDocuments(
-      config.databaseId!, 
-      config.jobsCollectionId!, 
+      config.databaseId!,
+      config.jobsCollectionId!,
       [
         Query.equal("recruiterId", userId)
       ]
@@ -364,6 +364,21 @@ export async function fetchRecruiterJobs(userId: string) {
     return response.documents;
   } catch (error) {
     console.error('Error fetching jobs:', error);
+    throw new Error('Failed to fetch jobs');
+  }
+}
+
+export async function fetchAllJobs() {
+  try {
+    const response = await databases.listDocuments(
+      config.databaseId!,
+      config.jobsCollectionId!,
+      []
+    );
+
+    return response.documents;
+  } catch (error) {
+    console.error('Error fetching all jobs:', error);
     throw new Error('Failed to fetch jobs');
   }
 }
