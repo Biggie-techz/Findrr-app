@@ -65,7 +65,7 @@ const NotificationSettings = () => {
       await updateUserProfile(user.$id, user.userType, {
         notificationSettings: JSON.stringify(notificationSettings),
       });
-      await refetch(); // Refresh user data
+      // await refetch(); // Refresh user data
       setIsEditing(false);
       Alert.alert('Success', 'Notification settings updated successfully');
     } catch (error) {

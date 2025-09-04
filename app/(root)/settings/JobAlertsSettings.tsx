@@ -1,3 +1,4 @@
+import Toast from '@/components/Toast';
 import { updateUserProfile } from '@/lib/appwrite';
 import { useGlobalContext } from '@/lib/global-provider';
 import { Ionicons } from '@expo/vector-icons';
@@ -5,7 +6,6 @@ import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -31,14 +31,16 @@ const JobAlertsSettings = () => {
       freelance: false,
       internship: false,
     },
-    locations: '',
-    salaryMin: '',
-    salaryMax: '',
     categories: '',
     experienceLevel: 'entry', // entry, mid, senior, executive
   });
 
   const [country, setCountry] = useState<any | null>(null);
+  const [toast, setToast] = useState<{
+    visible: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({ visible: false, message: '', type: 'success' });
 
   useEffect(() => {
     if (user?.profile?.jobAlertSettings) {
@@ -56,9 +58,6 @@ const JobAlertsSettings = () => {
           freelance: parsedSettings.jobTypes?.freelance ?? false,
           internship: parsedSettings.jobTypes?.internship ?? false,
         },
-        locations: parsedSettings.locations ?? '',
-        salaryMin: parsedSettings.salaryMin ?? '',
-        salaryMax: parsedSettings.salaryMax ?? '',
         categories: parsedSettings.categories ?? '',
         experienceLevel: parsedSettings.experienceLevel ?? 'entry',
       });
@@ -86,7 +85,11 @@ const JobAlertsSettings = () => {
 
   const handleSave = async () => {
     if (!user?.userType || !user?.$id) {
-      Alert.alert('Error', 'User information not available');
+      setToast({
+        visible: true,
+        message: 'User information not available',
+        type: 'error',
+      });
       return;
     }
 
@@ -97,15 +100,23 @@ const JobAlertsSettings = () => {
       await updateUserProfile(user.$id, user.userType, {
         jobAlertSettings: JSON.stringify({
           ...jobAlertSettings,
-          locations: location,
+          locations: country,
         }),
       });
-      await refetch(); // Refresh user data
+      // await refetch(); // Refresh user data
       setIsEditing(false);
-      Alert.alert('Success', 'Job alert settings updated successfully');
+      setToast({
+        visible: true,
+        message: 'Job alert settings updated successfully',
+        type: 'success',
+      });
     } catch (error) {
       console.error('Error updating job alert settings:', error);
-      Alert.alert('Error', 'Failed to update settings. Please try again.');
+      setToast({
+        visible: true,
+        message: 'Failed to update settings. Please try again.',
+        type: 'error',
+      });
     } finally {
       setLoading(false);
     }
@@ -133,19 +144,19 @@ const JobAlertsSettings = () => {
     description: string,
     disabled = false
   ) => (
-    <View className="flex-row items-center justify-between py-4 border-b border-gray-100">
+    <View className="flex-row items-center justify-between py-5 px-2 border-b border-slate-100">
       <View className="flex-1 mr-4">
-        <Text className="text-base font-rubik-medium text-gray-900 mb-1">
+        <Text className="text-base font-rubik-bold text-slate-900 mb-1">
           {label}
         </Text>
-        <Text className="text-sm text-gray-600 font-rubik">{description}</Text>
+        <Text className="text-sm text-slate-600 font-rubik">{description}</Text>
       </View>
       <Switch
         value={getNestedValue(field)}
         onValueChange={(value) => handleToggle(field, value)}
         disabled={!isEditing || disabled}
-        trackColor={{ false: '#D1D5DB', true: '#3B82F6' }}
-        thumbColor={getNestedValue(field) ? '#FFFFFF' : '#F3F4F6'}
+        trackColor={{ false: '#CBD5E1', true: '#6366F1' }}
+        thumbColor={getNestedValue(field) ? '#FFFFFF' : '#F1F5F9'}
       />
     </View>
   );
@@ -157,27 +168,27 @@ const JobAlertsSettings = () => {
     multiline = false,
     keyboardType: 'default' | 'numeric' = 'default'
   ) => (
-    <View className="mb-4">
-      <Text className="text-sm font-rubik-medium text-gray-700 mb-2">
+    <View className="mb-6">
+      <Text className="text-sm font-rubik-bold text-slate-700 mb-3">
         {label}
       </Text>
       {isEditing ? (
         <TextInput
-          className={`border border-gray-300 rounded-lg px-4 py-3 text-gray-900 font-rubik ${
-            multiline ? 'h-20' : 'h-12'
+          className={`border border-slate-300 rounded-2xl px-4 py-4 text-slate-900 font-rubik bg-white ${
+            multiline ? 'h-24' : 'h-14'
           }`}
           value={
             jobAlertSettings[field as keyof typeof jobAlertSettings] as string
           }
           onChangeText={(value) => handleInputChange(field, value)}
           placeholder={placeholder}
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor="#94A3B8"
           multiline={multiline}
           keyboardType={keyboardType}
         />
       ) : (
-        <View className="border border-gray-200 rounded-lg px-4 py-3 bg-gray-50">
-          <Text className="text-gray-900 font-rubik">
+        <View className="border border-slate-200 rounded-2xl px-4 py-4 bg-slate-50">
+          <Text className="text-slate-900 font-rubik">
             {(jobAlertSettings[
               field as keyof typeof jobAlertSettings
             ] as string) || `No ${label.toLowerCase()} specified`}
@@ -188,27 +199,27 @@ const JobAlertsSettings = () => {
   );
 
   const renderExperienceSelector = () => (
-    <View className="mb-4">
-      <Text className="text-sm font-rubik-medium text-gray-700 mb-2">
+    <View className="mb-6">
+      <Text className="text-sm font-rubik-bold text-slate-700 mb-3">
         Experience Level
       </Text>
       {isEditing ? (
-        <View className="flex-row gap-2">
+        <View className="flex-row gap-3">
           {['entry', 'mid', 'senior', 'executive'].map((level) => (
             <TouchableOpacity
               key={level}
-              className={`flex-1 py-3 px-4 rounded-lg border ${
+              className={`flex-1 py-7 px-2 rounded-2xl border-2 ${
                 jobAlertSettings.experienceLevel === level
-                  ? 'border-blue-600 bg-blue-50'
-                  : 'border-gray-300 bg-white'
+                  ? 'border-indigo-500 bg-indigo-50'
+                  : 'border-slate-200 bg-white'
               }`}
               onPress={() => handleInputChange('experienceLevel', level)}
             >
               <Text
-                className={`text-center font-rubik-medium capitalize ${
+                className={`text-center font-rubik-bold capitalize text-sm ${
                   jobAlertSettings.experienceLevel === level
-                    ? 'text-blue-600'
-                    : 'text-gray-700'
+                    ? 'text-indigo-600'
+                    : 'text-slate-700'
                 }`}
               >
                 {level}
@@ -217,8 +228,8 @@ const JobAlertsSettings = () => {
           ))}
         </View>
       ) : (
-        <View className="border border-gray-200 rounded-lg px-4 py-3 bg-gray-50">
-          <Text className="text-gray-900 font-rubik capitalize">
+        <View className="border border-slate-200 rounded-2xl px-4 py-4 bg-slate-50">
+          <Text className="text-slate-900 font-rubik capitalize">
             {jobAlertSettings.experienceLevel} level
           </Text>
         </View>
@@ -226,142 +237,205 @@ const JobAlertsSettings = () => {
     </View>
   );
 
+  const renderJobAlertsSection = (
+    title: string,
+    icon: string,
+    color: string,
+    children: React.ReactNode
+  ) => (
+    <View className="mb-8">
+      <View className="flex-row items-center mb-6">
+        <View
+          className={`w-10 h-10 bg-${color} rounded-2xl items-center justify-center mr-3`}
+        >
+          <Ionicons name={icon as any} size={20} color="white" />
+        </View>
+        <Text className="text-lg font-rubik-bold text-slate-900">{title}</Text>
+      </View>
+      <View className="bg-white rounded-3xl border border-white/50 overflow-hidden">
+        {children}
+      </View>
+    </View>
+  );
+
   if (!user) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center">
-        <Text className="text-gray-500">Loading user information...</Text>
+      <SafeAreaView className="flex-1 items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <ActivityIndicator size="large" color="#6366F1" />
+        <Text className="text-slate-500 mt-4 font-rubik">
+          Loading user information...
+        </Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
       >
-        {/* Header */}
-        <View className="flex-row items-center justify-between px-6 py-4 border-b border-gray-200">
-          <TouchableOpacity onPress={() => router.back()} className="p-2">
-            <Ionicons name="arrow-back" size={24} color="#374151" />
-          </TouchableOpacity>
-          <Text className="text-xl font-rubik-bold text-gray-900">
-            Job Alert Settings
-          </Text>
-          <View className="w-10" />
+        {/* Modern Header */}
+        <View className="bg-white/80 backdrop-blur-lg border-b border-white/20">
+          <View className="flex-row items-center justify-between px-6 py-5">
+            <TouchableOpacity
+              onPress={() => router.back()}
+              className="w-12 h-12 bg-slate-100 rounded-2xl items-center justify-center"
+            >
+              <Ionicons name="arrow-back" size={22} color="#475569" />
+            </TouchableOpacity>
+            <View className="flex-1 items-center">
+              <Text className="text-xl font-rubik-bold text-slate-900">
+                Job Alert Settings
+              </Text>
+              <Text className="text-sm text-slate-500 font-rubik mt-1">
+                Customize your job alert preferences
+              </Text>
+            </View>
+            <View className="w-12" />
+          </View>
         </View>
 
         <ScrollView
           className="flex-1 px-6 py-6"
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
         >
           {/* General Settings */}
-          <View className="mb-6">
-            <View className="flex items-center justify-between flex-row mb-4">
-              <Text className="text-lg font-rubik-bold text-gray-900 mb-4">
-                General Settings
-              </Text>
-              <TouchableOpacity
-                className="flex bg-blue-500/70 rounded-full py-1 px-4 items-center"
-                onPress={() => setIsEditing(true)}
-              >
-                <Text className="text-white font-rubik-medium">
-                  Edit Profile
-                </Text>
-              </TouchableOpacity>
-            </View>
-            {renderToggle(
-              'Enable Job Alerts',
-              'enabled',
-              'Receive job alerts based on your preferences'
-            )}
-          </View>
-
-          {/* Job Preferences */}
-          <View className="mb-6">
-            <Text className="text-lg font-rubik-bold text-gray-900 mb-4">
-              Job Preferences
-            </Text>
-            {renderField(
-              'Keywords',
-              'keywords',
-              'Enter keywords (e.g., React, Node.js)',
-              true
-            )}
-            {renderField(
-              'Categories',
-              'categories',
-              'Enter job categories (comma separated)',
-              true
-            )}
-            {renderExperienceSelector()}
-          </View>
-
-          {/* Job Types */}
-          <View className="mb-6">
-            <Text className="text-lg font-rubik-bold text-gray-900 mb-4">
-              Job Types
-            </Text>
-            {renderToggle(
-              'Full Time',
-              'jobTypes.fullTime',
-              'Include full-time positions'
-            )}
-            {renderToggle(
-              'Part Time',
-              'jobTypes.partTime',
-              'Include part-time positions'
-            )}
-            {renderToggle(
-              'Contract',
-              'jobTypes.contract',
-              'Include contract positions'
-            )}
-            {renderToggle(
-              'Freelance',
-              'jobTypes.freelance',
-              'Include freelance opportunities'
-            )}
-            {renderToggle(
-              'Internship',
-              'jobTypes.internship',
-              'Include internship positions'
-            )}
-          </View>
-
-          {/* Action Buttons */}
-          <View className="flex-row gap-4 mb-8">
-            {isEditing ? (
-              <>
+          {renderJobAlertsSection(
+            'General Settings',
+            'settings',
+            'blue-500',
+            <>
+              <View className="flex-row items-center justify-between p-6 border-b border-slate-100">
+                <View className="flex-1">
+                  <Text className="text-base font-rubik-bold text-slate-900 mb-1">
+                    Edit Mode
+                  </Text>
+                  <Text className="text-sm text-slate-600 font-rubik">
+                    Enable editing to modify your job alert preferences
+                  </Text>
+                </View>
                 <TouchableOpacity
-                  className="flex-1 bg-blue-600 rounded-lg py-4 items-center"
-                  onPress={handleSave}
-                  disabled={loading}
+                  className={`px-6 py-3 rounded-2xl ${
+                    isEditing ? 'bg-emerald-500' : 'bg-blue-500'
+                  }`}
+                  onPress={() => setIsEditing(!isEditing)}
                 >
-                  {loading ? (
-                    <ActivityIndicator color="#FFFFFF" />
-                  ) : (
-                    <Text className="text-white font-rubik-medium">
-                      Save Changes
-                    </Text>
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className="flex-1 bg-gray-300 rounded-lg py-4 items-center"
-                  onPress={() => setIsEditing(false)}
-                  disabled={loading}
-                >
-                  <Text className="text-gray-700 font-rubik-medium">
-                    Cancel
+                  <Text className="text-white font-rubik-bold">
+                    {isEditing ? 'Done' : 'Edit'}
                   </Text>
                 </TouchableOpacity>
-              </>
-            ) : (
-              ''
-            )}
-          </View>
+              </View>
+              {renderToggle(
+                'Enable Job Alerts',
+                'enabled',
+                'Receive job alerts based on your preferences'
+              )}
+            </>
+          )}
+
+          {/* Job Preferences */}
+          {renderJobAlertsSection(
+            'Job Preferences',
+            'briefcase',
+            'teal-600',
+            <View className="p-6">
+              {renderField(
+                'Keywords',
+                'keywords',
+                'Enter keywords (e.g., React, Node.js)',
+                true
+              )}
+              {renderField(
+                'Categories',
+                'categories',
+                'Enter job categories (comma separated)',
+                true
+              )}
+              {renderExperienceSelector()}
+            </View>
+          )}
+
+          {/* Job Types */}
+          {renderJobAlertsSection(
+            'Job Types',
+            'business',
+            'orange-600',
+            <>
+              {renderToggle(
+                'Full Time',
+                'jobTypes.fullTime',
+                'Include full-time positions'
+              )}
+              {renderToggle(
+                'Part Time',
+                'jobTypes.partTime',
+                'Include part-time positions'
+              )}
+              {renderToggle(
+                'Contract',
+                'jobTypes.contract',
+                'Include contract positions'
+              )}
+              {renderToggle(
+                'Freelance',
+                'jobTypes.freelance',
+                'Include freelance opportunities'
+              )}
+              {renderToggle(
+                'Internship',
+                'jobTypes.internship',
+                'Include internship positions'
+              )}
+            </>
+          )}
+
+          {/* Action Buttons */}
+          {isEditing && (
+            <View className="flex-row gap-4 mb-8">
+              <TouchableOpacity
+                className="flex-1 bg-blue-500 rounded-3xl py-4 items-center"
+                onPress={handleSave}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <View className="flex-row items-center">
+                    <Ionicons name="checkmark" size={20} color="white" />
+                    <Text className="text-white font-rubik-bold text-base ml-2">
+                      Save Changes
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="flex-1 bg-red-500 rounded-3xl py-4 items-center"
+                onPress={() => setIsEditing(false)}
+                disabled={loading}
+              >
+                <View className="flex-row items-center">
+                  <Ionicons name="close" size={20} color="#FFFFFF" />
+                  <Text className="text-white font-rubik-bold text-base ml-2">
+                    Cancel
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Toast Notification */}
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={() =>
+          setToast({ visible: false, message: '', type: 'success' })
+        }
+      />
     </SafeAreaView>
   );
 };

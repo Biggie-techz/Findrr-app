@@ -51,7 +51,7 @@ const PreferredLocations = () => {
       await updateUserProfile(user.$id, user.userType, {
         preferredLocations: preferredLocations,
       });
-      await refetch();
+      // await refetch();
       setIsEditing(false);
       Alert.alert('Success', 'Preferred locations updated successfully');
     } catch (error) {

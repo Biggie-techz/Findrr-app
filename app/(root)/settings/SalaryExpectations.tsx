@@ -1,3 +1,4 @@
+import Toast from '@/components/Toast';
 import { updateUserProfile } from '@/lib/appwrite';
 import { useGlobalContext } from '@/lib/global-provider';
 import { Ionicons } from '@expo/vector-icons';
@@ -5,7 +6,6 @@ import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -20,6 +20,11 @@ const SalaryExpectations = () => {
   const { user, refetch } = useGlobalContext();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState<{
+    visible: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({ visible: false, message: '', type: 'success' });
   const [formData, setFormData] = useState({
     minSalary: '',
     maxSalary: '',
@@ -44,13 +49,21 @@ const SalaryExpectations = () => {
 
   const handleSave = async () => {
     if (!user?.userType || !user?.$id) {
-      Alert.alert('Error', 'User information not available');
+      setToast({
+        visible: true,
+        message: 'User information not available',
+        type: 'error',
+      });
       return;
     }
 
     // Basic validation
     if (!formData.minSalary || !formData.maxSalary) {
-      Alert.alert('Error', 'Please fill in both minimum and maximum salary');
+      setToast({
+        visible: true,
+        message: 'Please fill in both minimum and maximum salary',
+        type: 'error',
+      });
       return;
     }
 
@@ -58,7 +71,11 @@ const SalaryExpectations = () => {
     const max = parseFloat(formData.maxSalary);
 
     if (isNaN(min) || isNaN(max) || min < 0 || max < 0 || min > max) {
-      Alert.alert('Error', 'Please enter valid salary amounts');
+      setToast({
+        visible: true,
+        message: 'Please enter valid salary amounts',
+        type: 'error',
+      });
       return;
     }
 
@@ -72,12 +89,20 @@ const SalaryExpectations = () => {
       };
 
       await updateUserProfile(user.$id, user.userType, updateData);
-      await refetch(); // Refresh user data
+      // await refetch(); // Refresh user data
       setIsEditing(false);
-      Alert.alert('Success', 'Salary expectations updated successfully');
+      setToast({
+        visible: true,
+        message: 'Salary expectations updated successfully',
+        type: 'success',
+      });
     } catch (error) {
       console.error('Error updating salary expectations:', error);
-      Alert.alert('Error', 'Failed to update salary expectations. Please try again.');
+      setToast({
+        visible: true,
+        message: 'Failed to update salary expectations. Please try again.',
+        type: 'error',
+      });
     } finally {
       setLoading(false);
     }
@@ -213,6 +238,14 @@ const SalaryExpectations = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Toast Notification */}
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={() => setToast({ visible: false, message: '', type: 'success' })}
+      />
     </SafeAreaView>
   );
 };
