@@ -195,16 +195,14 @@ const PersonalInformation = () => {
     icon?: keyof typeof Ionicons.glyphMap
   ) => (
     <View className="mb-5">
-      <View className="mb-3 flex-row items-center">
+      <View className="text-slate-700 mb-3 flex-row items-center">
         {icon && (
           <Ionicons name={icon} size={16} color="#64748B" className="mr-2" />
         )}
-        <Text className="text-sm font-rubik-semibold text-slate-700 ">
-          {label}
-        </Text>
+        <Text className="text-sm font-rubik-semibold ">{label}</Text>
       </View>
       {isEditing ? (
-        <View className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm overflow-hidden">
+        <View className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden">
           <TextInput
             className={`px-5 py-4 text-slate-900 font-rubik text-base ${
               multiline ? 'h-24' : 'h-14'
@@ -220,7 +218,7 @@ const PersonalInformation = () => {
           />
         </View>
       ) : (
-        <View className="bg-white rounded-2xl px-5 py-4 border border-slate-200 shadow-sm">
+        <View className="bg-slate-100 rounded-2xl px-5 py-4 border border-slate-200">
           <Text className="text-slate-900 font-rubik text-base">
             {formData[field as keyof typeof formData] ||
               `No ${label.toLowerCase()} provided`}
@@ -233,7 +231,7 @@ const PersonalInformation = () => {
   if (!user) {
     return (
       <SafeAreaView className="flex-1 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 items-center justify-center">
-        <View className="bg-white rounded-3xl p-8 shadow-lg">
+        <View className="bg-white rounded-3xl p-8">
           <ActivityIndicator size="large" color="#6366F1" />
           <Text className="text-slate-600 font-rubik-medium mt-4 text-center">
             Loading your profile...
@@ -250,11 +248,11 @@ const PersonalInformation = () => {
         className="flex-1"
       >
         {/* Modern Header */}
-        <View className="bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-sm">
+        <View className="bg-white/80 backdrop-blur-lg border-b border-white/20">
           <View className="flex-row items-center justify-between px-6 py-5">
             <TouchableOpacity
               onPress={() => router.back()}
-              className="w-12 h-12 bg-slate-100 rounded-2xl items-center justify-center shadow-sm"
+              className="w-12 h-12 bg-slate-100 rounded-2xl items-center justify-center"
             >
               <Ionicons name="arrow-back" size={22} color="#475569" />
             </TouchableOpacity>
@@ -277,10 +275,10 @@ const PersonalInformation = () => {
           contentContainerStyle={{ paddingBottom: 100 }}
         >
           {/* Profile Header Card */}
-          <View className="bg-white rounded-3xl p-6 mb-6 shadow-lg border border-white/50">
+          <View className="bg-white rounded-3xl p-6 mb-6 border border-white/50">
             <View className="items-center mb-4">
-              <View className="w-20 h-20 bg-black-100/10 rounded-full items-center justify-center shadow-lg mb-3">
-                <Text className="text-black-100 font-rubik-bold text-2xl">
+              <View className="w-20 h-20 bg-black-100 rounded-full items-center justify-center mb-3">
+                <Text className="text-white font-rubik-bold text-2xl">
                   {formData.firstName?.[0]?.toUpperCase() ||
                     user.email?.[0]?.toUpperCase() ||
                     'U'}
@@ -298,10 +296,8 @@ const PersonalInformation = () => {
 
             <TouchableOpacity
               onPress={() => setIsEditing(!isEditing)}
-              className={`w-full py-4 rounded-2xl items-center shadow-lg ${
-                isEditing
-                  ? 'bg-red-500'
-                  : 'bg-blue-500'
+              className={`w-full py-4 rounded-2xl items-center ${
+                isEditing ? 'bg-red-500' : 'bg-blue-500'
               }`}
             >
               <Text className="text-white font-rubik-bold text-base">
@@ -311,7 +307,7 @@ const PersonalInformation = () => {
           </View>
 
           {/* Basic Information Section */}
-          <View className="bg-white rounded-3xl p-6 mb-6 shadow-lg border border-white/50">
+          <View className="bg-white rounded-3xl p-6 mb-6 border border-white/50">
             <View className="flex-row items-center mb-6">
               <Text className="text-lg font-rubik-bold text-slate-900">
                 Basic Information
@@ -351,11 +347,11 @@ const PersonalInformation = () => {
                   color="#64748B"
                   className="mr-2"
                 />
-                <Text className="text-sm font-rubik-semibold text-slate-700 ">
+                <Text className="text-sm font-rubik-semibold text-slate-700">
                   Email Address
                 </Text>
               </View>
-              <View className="bg-white rounded-2xl px-5 py-4 border border-slate-200 shadow-sm">
+              <View className="bg-slate-100 rounded-2xl px-5 py-4 border border-slate-200">
                 <Text className="text-slate-900 font-rubik text-base">
                   {user.email}
                 </Text>
@@ -365,7 +361,7 @@ const PersonalInformation = () => {
 
           {/* Applicant Specific Fields */}
           {user.userType === 'applicant' && (
-            <View className="bg-white rounded-3xl p-6 mb-6 shadow-lg border border-white/50">
+            <View className="bg-white rounded-3xl p-6 mb-6 border border-white/50">
               <View className="flex-row items-center mb-6">
                 <Text className="text-lg font-rubik-bold text-slate-900">
                   Professional Information
@@ -373,17 +369,19 @@ const PersonalInformation = () => {
               </View>
 
               <View className="mb-5">
-                <Text className="text-sm font-rubik-semibold text-slate-700 mb-3 flex-row items-center">
+                <View className="mb-3 flex-row items-center">
                   <Ionicons
                     name="location"
                     size={16}
                     color="#64748B"
                     className="mr-2"
                   />
-                  Location
-                </Text>
+                  <Text className="text-sm font-rubik-semibold text-slate-700 ">
+                    Location
+                  </Text>
+                </View>
                 {isEditing ? (
-                  <View className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm p-4">
+                  <View className="bg-white rounded-2xl border-2 border-slate-200 p-4">
                     <View className="flex-row items-center mb-3">
                       <Ionicons name="earth" size={20} color="#6366F1" />
                       <Text className="ml-3 text-slate-700 font-rubik-medium">
@@ -450,7 +448,7 @@ const PersonalInformation = () => {
                     )}
                   </View>
                 ) : (
-                  <View className="bg-white rounded-2xl px-5 py-4 border border-slate-200 shadow-sm">
+                  <View className="bg-slate-100 rounded-2xl px-5 py-4 border border-slate-200">
                     <Text className="text-slate-900 font-rubik text-base">
                       {formData.location || 'No location provided'}
                     </Text>
@@ -459,17 +457,19 @@ const PersonalInformation = () => {
               </View>
 
               <View className="mb-5">
-                <Text className="text-sm font-rubik-semibold text-slate-700 mb-3 flex-row items-center">
+                <View className="mb-3 flex-row items-center">
                   <Ionicons
                     name="document"
                     size={16}
                     color="#64748B"
                     className="mr-2"
                   />
-                  Resume
-                </Text>
+                  <Text className="text-sm font-rubik-semibold text-slate-700">
+                    Resume
+                  </Text>
+                </View>
                 {isEditing ? (
-                  <View className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm p-4">
+                  <View className="bg-white rounded-2xl border-2 border-slate-200 p-4">
                     <TextInput
                       className="px-4 py-3 text-slate-900 font-rubik text-base h-14 bg-slate-50 rounded-xl mb-3"
                       value={formData.resume}
@@ -482,7 +482,7 @@ const PersonalInformation = () => {
                       autoCapitalize="none"
                     />
                     <TouchableOpacity
-                      className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl py-4 items-center shadow-lg"
+                      className="bg-blue-500 rounded-xl py-4 items-center"
                       onPress={() => {
                         setToast({
                           visible: true,
@@ -500,7 +500,7 @@ const PersonalInformation = () => {
                     </TouchableOpacity>
                   </View>
                 ) : (
-                  <View className="bg-white rounded-2xl px-5 py-4 border border-slate-200 shadow-sm">
+                  <View className="bg-slate-100 rounded-2xl px-5 py-4 border border-slate-200">
                     <Text className="text-slate-900 font-rubik text-base">
                       {formData.resume || 'No resume provided'}
                     </Text>
@@ -509,17 +509,19 @@ const PersonalInformation = () => {
               </View>
 
               <View className="mb-5">
-                <Text className="text-sm font-rubik-semibold text-slate-700 mb-3 flex-row items-center">
+                <View className="mb-3 flex-row items-center">
                   <Ionicons
                     name="code"
                     size={16}
                     color="#64748B"
                     className="mr-2"
                   />
-                  Skills
-                </Text>
+                  <Text className="text-sm font-rubik-semibold text-slate-700 ">
+                    Skills
+                  </Text>
+                </View>
                 {isEditing ? (
-                  <View className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm p-4">
+                  <View className="bg-white rounded-2xl border-2 border-slate-200 p-4">
                     <Dropdown
                       style={{
                         backgroundColor: '#F8FAFC',
@@ -569,7 +571,7 @@ const PersonalInformation = () => {
                     </Text>
                   </View>
                 ) : (
-                  <View className="bg-white rounded-2xl px-5 py-4 border border-slate-200 shadow-sm">
+                  <View className="bg-slate-100 rounded-2xl px-5 py-4 border border-slate-200">
                     <Text className="text-slate-900 font-rubik text-base">
                       {formData.skills || 'No skills provided'}
                     </Text>
@@ -581,7 +583,7 @@ const PersonalInformation = () => {
 
           {/* Recruiter Specific Fields */}
           {user.userType === 'recruiter' && (
-            <View className="bg-white rounded-3xl p-6 mb-6 shadow-lg border border-white/50">
+            <View className="bg-white rounded-3xl p-6 mb-6 border border-white/50">
               <View className="flex-row items-center mb-6">
                 <Text className="text-lg font-rubik-bold text-slate-900">
                   Company Information
@@ -611,7 +613,7 @@ const PersonalInformation = () => {
           {isEditing && (
             <View className="flex-row gap-4 mb-8">
               <TouchableOpacity
-                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl py-4 items-center shadow-lg"
+                className="flex-1 bg-emerald-600 rounded-2xl py-4 items-center"
                 onPress={handleSave}
                 disabled={loading}
               >
@@ -619,21 +621,21 @@ const PersonalInformation = () => {
                   <ActivityIndicator color="#FFFFFF" />
                 ) : (
                   <View className="flex-row items-center">
-                    <Ionicons name="checkmark" size={20} color="#666876" />
-                    <Text className="text-black-200 font-rubik-bold text-base ml-2">
+                    <Ionicons name="checkmark" size={20} color="white" />
+                    <Text className="text-white font-rubik-bold text-base ml-2">
                       Save Changes
                     </Text>
                   </View>
                 )}
               </TouchableOpacity>
               <TouchableOpacity
-                className="flex-1 bg-gradient-to-r from-slate-400 to-slate-500 rounded-2xl py-4 items-center shadow-lg"
+                className="flex-1 bg-red-500 rounded-2xl py-4 items-center"
                 onPress={() => setIsEditing(false)}
                 disabled={loading}
               >
                 <View className="flex-row items-center">
-                  <Ionicons name="close" size={20} color="#F75555" />
-                  <Text className="text-danger font-rubik-bold text-base ml-2">
+                  <Ionicons name="close" size={20} color="white" />
+                  <Text className="text-white font-rubik-bold text-base ml-2">
                     Cancel
                   </Text>
                 </View>

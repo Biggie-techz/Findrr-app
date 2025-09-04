@@ -82,94 +82,141 @@ const NotificationSettings = () => {
     description: string,
     disabled = false
   ) => (
-    <View className="flex-row items-center justify-between py-4 border-b border-gray-100">
+    <View className="flex-row items-center justify-between py-5 px-2 border-b border-slate-100">
       <View className="flex-1 mr-4">
-        <Text className="text-base font-rubik-medium text-gray-900 mb-1">
+        <Text className="text-base font-rubik-bold text-slate-900 mb-1">
           {label}
         </Text>
-        <Text className="text-sm text-gray-600 font-rubik">{description}</Text>
+        <Text className="text-sm text-slate-600 font-rubik">{description}</Text>
       </View>
       <Switch
         value={notificationSettings[field as keyof typeof notificationSettings]}
         onValueChange={(value) => handleToggle(field, value)}
         disabled={!isEditing || disabled}
-        trackColor={{ false: '#D1D5DB', true: '#3B82F6' }}
+        trackColor={{ false: '#CBD5E1', true: '#6366F1' }}
         thumbColor={
           notificationSettings[field as keyof typeof notificationSettings]
             ? '#FFFFFF'
-            : '#F3F4F6'
+            : '#F1F5F9'
         }
       />
     </View>
   );
 
+  const renderNotificationSection = (
+    title: string,
+    icon: string,
+    color: string,
+    children: React.ReactNode
+  ) => (
+    <View className="mb-8">
+      <View className="flex-row items-center mb-6">
+        <View className={`w-10 h-10 bg-${color} rounded-2xl items-center justify-center mr-3`}>
+          <Ionicons name={icon as any} size={20} color="white" />
+        </View>
+        <Text className="text-lg font-rubik-bold text-slate-900">
+          {title}
+        </Text>
+      </View>
+      <View className="bg-white rounded-3xl border border-white/50 overflow-hidden">
+        {children}
+      </View>
+    </View>
+  );
+
   if (!user) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center">
-        <Text className="text-gray-500">Loading user information...</Text>
+      <SafeAreaView className="flex-1 items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <ActivityIndicator size="large" color="#6366F1" />
+        <Text className="text-slate-500 mt-4 font-rubik">Loading user information...</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
       >
-        {/* Header */}
-        <View className="flex-row items-center justify-between px-6 py-4 border-b border-gray-200">
-          <TouchableOpacity onPress={() => router.back()} className="p-2">
-            <Ionicons name="arrow-back" size={24} color="#374151" />
-          </TouchableOpacity>
-          <Text className="text-xl font-rubik-bold text-gray-900">
-            Notification Settings
-          </Text>
-          <View className="w-10" />
+        {/* Modern Header */}
+        <View className="bg-white/80 backdrop-blur-lg border-b border-white/20">
+          <View className="flex-row items-center justify-between px-6 py-5">
+            <TouchableOpacity
+              onPress={() => router.back()}
+              className="w-12 h-12 bg-slate-100 rounded-2xl items-center justify-center"
+            >
+              <Ionicons name="arrow-back" size={22} color="#475569" />
+            </TouchableOpacity>
+            <View className="flex-1 items-center">
+              <Text className="text-xl font-rubik-bold text-slate-900">
+                Notification Settings
+              </Text>
+              <Text className="text-sm text-slate-500 font-rubik mt-1">
+                Manage your notification preferences
+              </Text>
+            </View>
+            <View className="w-12" />
+          </View>
         </View>
 
         <ScrollView
           className="flex-1 px-6 py-6"
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
         >
           {/* General Notifications */}
-          <View className="mb-6">
-            <View className="flex items-center justify-between flex-row mb-4">
-              <Text className="text-lg font-rubik-bold text-gray-900 mb-4">
-                General Notifications
-              </Text>
-              <TouchableOpacity
-                className="flex bg-blue-500/70 rounded-full py-1 px-4 items-center"
-                onPress={() => setIsEditing(true)}
-              >
-                <Text className="text-white font-rubik-medium">
-                  Edit Profile
-                </Text>
-              </TouchableOpacity>
-            </View>
-            {renderToggle(
-              'Email Notifications',
-              'emailNotifications',
-              'Receive notifications via email'
-            )}
-            {renderToggle(
-              'Push Notifications',
-              'pushNotifications',
-              'Receive push notifications on your device'
-            )}
-            {renderToggle(
-              'Marketing Emails',
-              'marketingEmails',
-              'Receive promotional emails and updates'
-            )}
-          </View>
+          {renderNotificationSection(
+            'General Notifications',
+            'notifications',
+            'blue-500',
+            <>
+              <View className="flex-row items-center justify-between p-6 border-b border-slate-100">
+                <View className="flex-1">
+                  <Text className="text-base font-rubik-bold text-slate-900 mb-1">
+                    Edit Mode
+                  </Text>
+                  <Text className="text-sm text-slate-600 font-rubik">
+                    Enable editing to modify your notification preferences
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  className={`px-6 py-3 rounded-2xl ${
+                    isEditing
+                      ? 'bg-emerald-500'
+                      : 'bg-blue-500'
+                  }`}
+                  onPress={() => setIsEditing(!isEditing)}
+                >
+                  <Text className="text-white font-rubik-bold">
+                    {isEditing ? 'Done' : 'Edit'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              {renderToggle(
+                'Email Notifications',
+                'emailNotifications',
+                'Receive notifications via email'
+              )}
+              {renderToggle(
+                'Push Notifications',
+                'pushNotifications',
+                'Receive push notifications on your device'
+              )}
+              {renderToggle(
+                'Marketing Emails',
+                'marketingEmails',
+                'Receive promotional emails and updates'
+              )}
+            </>
+          )}
 
           {/* Job Related Notifications */}
-          {user.userType === 'applicant' && (
-            <View className="mb-6">
-              <Text className="text-lg font-rubik-bold text-gray-900 mb-4">
-                Job Notifications
-              </Text>
+          {user.userType === 'applicant' && renderNotificationSection(
+            'Job Notifications',
+            'briefcase',
+            'teal-600',
+            <>
               {renderToggle(
                 'Job Alerts',
                 'jobAlerts',
@@ -185,15 +232,15 @@ const NotificationSettings = () => {
                 'interviewInvites',
                 'Get notified when you receive interview invitations'
               )}
-            </View>
+            </>
           )}
 
           {/* Recruiter Notifications */}
-          {user.userType === 'recruiter' && (
-            <View className="mb-6">
-              <Text className="text-lg font-rubik-bold text-gray-900 mb-4">
-                Recruiter Notifications
-              </Text>
+          {user.userType === 'recruiter' && renderNotificationSection(
+            'Recruiter Notifications',
+            'business',
+            'orange-500',
+            <>
               {renderToggle(
                 'New Applications',
                 'newApplications',
@@ -204,40 +251,42 @@ const NotificationSettings = () => {
                 'jobViews',
                 'Receive notifications when your jobs are viewed'
               )}
-            </View>
+            </>
           )}
 
           {/* Action Buttons */}
-          <View className="flex-row gap-4 mb-8">
-            {isEditing ? (
-              <>
-                <TouchableOpacity
-                  className="flex-1 bg-blue-600 rounded-lg py-4 items-center"
-                  onPress={handleSave}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <ActivityIndicator color="#FFFFFF" />
-                  ) : (
-                    <Text className="text-white font-rubik-medium">
+          {isEditing && (
+            <View className="flex-row gap-4 mb-8">
+              <TouchableOpacity
+                className="flex-1 bg-blue-500 rounded-3xl py-4 items-center"
+                onPress={handleSave}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <View className="flex-row items-center">
+                    <Ionicons name="checkmark" size={20} color="white" />
+                    <Text className="text-white font-rubik-bold text-base ml-2">
                       Save Changes
                     </Text>
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className="flex-1 bg-gray-300 rounded-lg py-4 items-center"
-                  onPress={() => setIsEditing(false)}
-                  disabled={loading}
-                >
-                  <Text className="text-gray-700 font-rubik-medium">
+                  </View>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="flex-1 bg-red-500 rounded-3xl py-4 items-center"
+                onPress={() => setIsEditing(false)}
+                disabled={loading}
+              >
+                <View className="flex-row items-center">
+                  <Ionicons name="close" size={20} color="#FFFFFF" />
+                  <Text className="text-white font-rubik-bold text-base ml-2">
                     Cancel
                   </Text>
-                </TouchableOpacity>
-              </>
-            ) : (
-              ''
-            )}
-          </View>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
