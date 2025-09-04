@@ -2,7 +2,7 @@ import { logout } from '@/lib/appwrite';
 import { useGlobalContext } from '@/lib/global-provider';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -71,7 +71,12 @@ const profileSections = [
     title: 'Support',
     icon: 'help-circle',
     items: [
-      { id: 1, title: 'Help Center', icon: 'help-buoy', href: '/settings/HelpCenter' },
+      {
+        id: 1,
+        title: 'Help Center',
+        icon: 'help-buoy',
+        href: '/settings/HelpCenter',
+      },
       {
         id: 2,
         title: 'Contact Support',
@@ -140,8 +145,19 @@ const ProfileSection = ({
 
 export default function Profile() {
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const [userInfo, setUserInfo] = useState({});
   const { user, refetch } = useGlobalContext();
   // console.log(user?.profile);
+
+  useEffect(() => {
+    const userPersonalInformation = JSON.parse(
+      user?.profile?.personalInformation || '{}'
+    );
+    setUserInfo(userPersonalInformation);
+    return () => {
+      console.log(`userPersonalInformation: ${JSON.stringify(userPersonalInformation)}`);
+    };
+  }, []);
 
   const handleLogout = async () => {
     setLogoutLoading(true);
@@ -200,7 +216,7 @@ export default function Profile() {
                   {user?.email || 'No email provided'}
                 </Text>
                 <Text className="text-gray-500 text-sm font-rubik">
-                  {user?.profile?.location || 'Location not set'}
+                  {userInfo?.location || user?.location || 'Location not set'}
                 </Text>
                 <Text className="text-gray-500 text-sm font-rubik">
                   Member since{' '}

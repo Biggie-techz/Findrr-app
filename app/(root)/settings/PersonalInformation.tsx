@@ -137,6 +137,8 @@ const PersonalInformation = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    // console.log(formData);
+    
   };
 
   const handleSave = async () => {
@@ -150,6 +152,10 @@ const PersonalInformation = () => {
     }
 
     setLoading(true);
+    console.log(country);
+    console.log(city);
+    console.log(`location: ${location}`);
+
     try {
       const personalInformation: any = {
         firstName: formData.firstName,
@@ -173,7 +179,7 @@ const PersonalInformation = () => {
       await updateUserProfile(user.$id, user.userType, {
         personalInformation: JSON.stringify(personalInformation),
       });
-      // await refetch(); // Refresh user data
+      // await refetch(); // Refresh user dxata
       setIsEditing(false);
       setToast({
         visible: true,

@@ -191,7 +191,7 @@ const ChatDetail = () => {
         <View className="bg-white border-b px-6 py-4 border-gray-200 flex-row items-center">
           <TouchableOpacity
             className="mr-2"
-            onPress={() => router.navigate('/Messages')}
+            onPress={() => router.back()}
           >
             <Ionicons name="chevron-back" size={24} color="#374151" />
           </TouchableOpacity>
