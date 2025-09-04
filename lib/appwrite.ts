@@ -382,3 +382,43 @@ export async function fetchAllJobs() {
     throw new Error('Failed to fetch jobs');
   }
 }
+
+export async function updateUserProfile(
+  userId: string,
+  userType: 'applicant' | 'recruiter',
+  updateData: any
+) {
+  try {
+    const collectionId =
+      userType === 'applicant'
+        ? config.applicantCollectionId!
+        : config.recruiterCollectionId!;
+
+    // First, find the document by userId
+    const documents = await databases.listDocuments(
+      config.databaseId!,
+      collectionId,
+      [Query.equal('userId', userId)]
+    );
+
+    if (documents.documents.length === 0) {
+      throw new Error('User profile not found');
+    }
+
+    const documentId = documents.documents[0].$id;
+
+    // Update the document with new data
+    const updatedDocument = await databases.updateDocument(
+      config.databaseId!,
+      collectionId,
+      documentId,
+      updateData
+    );
+
+    return updatedDocument;
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    throw new Error('Failed to update profile');
+  }
+}
+

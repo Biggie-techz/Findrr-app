@@ -157,7 +157,7 @@ const RecruiterSignUp = () => {
             {/* Header */}
             <View className="items-center mb-8">
               <Image
-                source={require('../assets/images/logo-text.png')}
+                source={require('../../assets/images/logo-text.png')}
                 style={{ width: 200, height: 80, resizeMode: 'contain' }}
               />
               <Text

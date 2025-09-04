@@ -1,5 +1,5 @@
 import { useGlobalContext } from '@/lib/global-provider';
-import { Slot } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import { ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -14,9 +14,13 @@ export default function AppLayout() {
     );
   }
 
-  // Redirect to onboarding if user is NOT logged in
-  // if (!isLogged) return <Redirect href={'/Onboarding'} />;
+  // If user is not logged in → send to onboarding
+  if (!isLogged) return <Redirect href="/Onboarding" />;
 
-  // Show the authenticated app content if user is logged in
-  return <Slot />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      {/* Tabs are the main entry */}
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    </Stack>
+  );
 }

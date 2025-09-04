@@ -20,13 +20,14 @@ export default function RootLayout() {
     }
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  if (!fontsLoaded) return null;
 
   return (
     <GlobalProvider>
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* Mount the entire (root) group */}
+        <Stack.Screen name="(root)" options={{ headerShown: false }} />
+      </Stack>
     </GlobalProvider>
   );
 }

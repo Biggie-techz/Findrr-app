@@ -1,7 +1,7 @@
 import { logout } from '@/lib/appwrite';
 import { useGlobalContext } from '@/lib/global-provider';
 import { Ionicons } from '@expo/vector-icons';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
@@ -25,19 +25,19 @@ const profileSections = [
         id: 1,
         title: 'Personal Information',
         icon: 'person',
-        href: '/Profile/Personal',
+        href: '/settings/PersonalInformation',
       },
       {
         id: 2,
         title: 'Notification Settings',
         icon: 'notifications',
-        href: '/Profile/Notifications',
+        href: '/settings/NotificationSettings',
       },
       {
         id: 3,
         title: 'Privacy & Security',
         icon: 'shield-checkmark',
-        href: '/Profile/Privacy',
+        href: '/settings/PrivacySecuritySettings',
       },
     ],
   },
@@ -50,19 +50,19 @@ const profileSections = [
         id: 1,
         title: 'Job Alerts',
         icon: 'alert-circle',
-        href: '/Profile/Alerts',
+        href: '/settings/JobAlertsSettings',
       },
       {
         id: 2,
         title: 'Preferred Locations',
         icon: 'location',
-        href: '/Profile/Locations',
+        href: '/settings/PreferredLocations',
       },
       {
         id: 3,
         title: 'Salary Expectations',
         icon: 'cash',
-        href: '/Profile/Salary',
+        href: '/settings/SalaryExpectations',
       },
     ],
   },
@@ -71,18 +71,18 @@ const profileSections = [
     title: 'Support',
     icon: 'help-circle',
     items: [
-      { id: 1, title: 'Help Center', icon: 'help-buoy', href: '/Profile/Help' },
+      { id: 1, title: 'Help Center', icon: 'help-buoy', href: '/settings/HelpCenter' },
       {
         id: 2,
         title: 'Contact Support',
         icon: 'chatbubbles',
-        href: '/Profile/Contact',
+        href: '/settings/ContactSupport',
       },
       {
         id: 3,
         title: 'About Findrr',
         icon: 'information-circle',
-        href: '/Profile/About',
+        href: '/settings/About',
       },
     ],
   },
@@ -120,19 +120,19 @@ const ProfileSection = ({
     </View>
     <View className="bg-white rounded-xl shadow-sm border border-gray-100">
       {section.items.map((item, index) => (
-        <Link key={item.id} href={item.href as any} asChild>
-          <TouchableOpacity
-            className={`flex-row items-center px-4 py-3 ${
-              index < section.items.length - 1 ? 'border-b border-gray-100' : ''
-            }`}
-          >
-            <Ionicons name={item.icon as any} size={20} color="#6B7280" />
-            <Text className="flex-1 ml-3 font-rubik text-gray-900">
-              {item.title}
-            </Text>
-            <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
-          </TouchableOpacity>
-        </Link>
+        <TouchableOpacity
+          key={item.id}
+          onPress={() => router.push(item.href as any)}
+          className={`flex-row items-center px-4 py-3 ${
+            index < section.items.length - 1 ? 'border-b border-gray-100' : ''
+          }`}
+        >
+          <Ionicons name={item.icon as any} size={20} color="#6B7280" />
+          <Text className="flex-1 ml-3 font-rubik text-gray-900">
+            {item.title}
+          </Text>
+          <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
+        </TouchableOpacity>
       ))}
     </View>
   </View>
@@ -142,7 +142,6 @@ export default function Profile() {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const { user, refetch } = useGlobalContext();
   // console.log(user?.profile);
-  
 
   const handleLogout = async () => {
     setLogoutLoading(true);
@@ -204,7 +203,10 @@ export default function Profile() {
                   {user?.profile?.location || 'Location not set'}
                 </Text>
                 <Text className="text-gray-500 text-sm font-rubik">
-                  Member since {user?.profile?.createdAt ? new Date(user.profile.createdAt).toLocaleDateString() : 'Unknown'}
+                  Member since{' '}
+                  {user?.profile?.createdAt
+                    ? new Date(user.profile.createdAt).toLocaleDateString()
+                    : 'Unknown'}
                 </Text>
               </View>
             </View>
@@ -235,13 +237,18 @@ export default function Profile() {
                   Profile Completion
                 </Text>
                 <Text className="text-sm font-rubik text-gray-600">
-                  {Number(user?.profile.profileCompleteCount / 6 * 100).toFixed()}%
+                  {Number(
+                    (user?.profile.profileCompleteCount / 6) * 100
+                  ).toFixed()}
+                  %
                 </Text>
               </View>
               <View className="w-full bg-gray-200 rounded-full h-2">
                 <View
                   className="bg-blue-600 h-2 rounded-full"
-                  style={{ width: `${Number(user?.profile.profileCompleteCount / 6 * 100).toFixed()}%` }}
+                  style={{
+                    width: `${Math.min((user?.profile.profileCompleteCount / 6) * 100, 100)}%`,
+                  }}
                 />
               </View>
             </View>

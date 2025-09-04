@@ -19,28 +19,28 @@ const onboardingData = [
     title: 'Welcome to Findrr',
     description:
       'Discover amazing opportunities and connect with professionals in your field',
-    image: require('../assets/images/logo-text.png'),
+    image: require('../../assets/images/logo-text.png'),
   },
   {
     id: '2',
     title: 'Find Your Dream Job',
     description:
       'Browse thousands of job listings tailored to your skills and preferences',
-    image: require('../assets/images/logo.png'),
+    image: require('../../assets/images/logo.png'),
   },
   {
     id: '3',
     title: 'Connect & Network',
     description:
       'Build meaningful professional relationships and grow your career network',
-    image: require('../assets/images/react-logo.png'),
+    image: require('../../assets/images/react-logo.png'),
   },
   {
     id: '4',
     title: 'Get Started Today',
     description:
       'Join our community and take the first step towards your career goals',
-    image: require('../assets/images/icon.png'),
+    image: require('../../assets/images/icon.png'),
   },
 ];
 

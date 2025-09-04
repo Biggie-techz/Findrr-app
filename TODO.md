@@ -1,0 +1,14 @@
+- [x] Fix package.json by removing the invalid "undefined" dependency.
+- [x] Run "npm install" to update dependencies.
+- [x] Run "npm run lint" to check for lint errors.
+- [x] Add personalInformation document creation upon signup in ApplicantSignUp.tsx.
+- [x] Fix infinite re-render loop in ApplicantSignUp.tsx (Maximum update depth exceeded error).
+- [x] Fix infinite re-render loop in app/(root)/_layout.tsx by stabilizing redirect logic.
+- [x] Optimize GlobalProvider with memoization to prevent unnecessary re-renders.
+- [x] Optimize PrivacySecuritySettings.tsx with useCallback to prevent unnecessary re-renders.
+- [x] Run the app and test for runtime errors (Expo server started).
+- [x] Remove outdated PDF rendering task from TODO.md (no PDF code found in Profile.tsx).
+- [x] Check PrivacySecuritySettings.tsx for any bugs or rendering errors (no issues found).
+- [ ] Add error boundaries for better error handling.
+- [ ] Test all screens for rendering issues and crashes.
+  
