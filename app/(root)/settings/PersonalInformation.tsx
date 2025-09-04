@@ -173,7 +173,7 @@ const PersonalInformation = () => {
       await updateUserProfile(user.$id, user.userType, {
         personalInformation: JSON.stringify(personalInformation),
       });
-      await refetch(); // Refresh user data
+      // await refetch(); // Refresh user data
       setIsEditing(false);
       setToast({
         visible: true,

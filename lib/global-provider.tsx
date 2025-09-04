@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext } from 'react';
+import React, { createContext, ReactNode, useCallback, useContext, useMemo } from 'react';
 
 import { getCurrentUser } from './appwrite';
 import { useAppwrite } from './useAppwrite';
@@ -39,20 +39,20 @@ export const GlobalProvider = ({ children }: GlobalProviderProps) => {
   const isLogged = !!user && !error;
 
   // Create a wrapper function that doesn't require parameters
-  const refetch = async () => {
+  const refetch = useCallback(async () => {
     await originalRefetch({} as Record<string, string | number>);
-  };
+  }, [originalRefetch]);
+
+  const value = useMemo(() => ({
+    isLogged,
+    user,
+    loading,
+    error,
+    refetch,
+  }), [isLogged, user, loading, error, refetch]);
 
   return (
-    <GlobalContext.Provider
-      value={{
-        isLogged,
-        user,
-        loading,
-        error,
-        refetch,
-      }}
-    >
+    <GlobalContext.Provider value={value}>
       {children}
     </GlobalContext.Provider>
   );
