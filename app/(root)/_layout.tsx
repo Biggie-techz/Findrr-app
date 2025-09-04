@@ -1,5 +1,5 @@
 import { useGlobalContext } from '@/lib/global-provider';
-import { Redirect, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -13,9 +13,6 @@ export default function AppLayout() {
       </SafeAreaView>
     );
   }
-
-  // If user is not logged in → send to onboarding
-  if (!isLogged) return <Redirect href="/Onboarding" />;
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
