@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   Text,
   TextInput,
@@ -20,12 +19,12 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const PersonalInformation = () => {
-  const { user, refetch } = useGlobalContext();
-  console.log(user);
+  const { user } = useGlobalContext();
+  const router = useRouter();
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -67,44 +66,6 @@ const PersonalInformation = () => {
     { label: 'HTML/CSS', value: 'htmlcss' },
   ];
 
-  const fetchCities = async () => {
-    if (!country) return;
-    setLoadingCities(true);
-    try {
-      const response = await fetch(
-        'https://countriesnow.space/api/v0.1/countries/cities',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ country: country.name }),
-        }
-      );
-
-      const data = await response.json();
-      console.log('Cities API response:', data);
-
-      if (data && Array.isArray(data.data)) {
-        const mappedCities = data.data.map((c: string) => ({
-          label: c,
-          value: c,
-        }));
-        setCities(mappedCities);
-      } else {
-        console.warn('No cities found for:', country.name);
-        setCities([]);
-      }
-    } catch (error) {
-      console.error('Error fetching cities:', error);
-      setCities([]);
-    } finally {
-      setLoadingCities(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCities();
-  }, [country]);
-
   useEffect(() => {
     if (user?.profile?.personalInformation) {
       const parsedProfile =
@@ -135,10 +96,42 @@ const PersonalInformation = () => {
     }
   }, [user]);
 
+  const fetchCities = async () => {
+    if (!country) return;
+    setLoadingCities(true);
+    try {
+      const response = await fetch(
+        'https://countriesnow.space/api/v0.1/countries/cities',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ country: country.name }),
+        }
+      );
+
+      const data = await response.json();
+      if (data && Array.isArray(data.data)) {
+        const mappedCities = data.data.map((c: string) => ({
+          label: c,
+          value: c,
+        }));
+        setCities(mappedCities);
+      } else {
+        setCities([]);
+      }
+    } catch (error) {
+      setCities([]);
+    } finally {
+      setLoadingCities(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCities();
+  }, [country]);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // console.log(formData);
-    
   };
 
   const handleSave = async () => {
@@ -152,9 +145,6 @@ const PersonalInformation = () => {
     }
 
     setLoading(true);
-    console.log(country);
-    console.log(city);
-    console.log(`location: ${location}`);
 
     try {
       const personalInformation: any = {
@@ -179,7 +169,6 @@ const PersonalInformation = () => {
       await updateUserProfile(user.$id, user.userType, {
         personalInformation: JSON.stringify(personalInformation),
       });
-      // await refetch(); // Refresh user dxata
       setIsEditing(false);
       setToast({
         visible: true,
@@ -187,7 +176,6 @@ const PersonalInformation = () => {
         type: 'success',
       });
     } catch (error) {
-      console.error('Error updating profile:', error);
       setToast({
         visible: true,
         message: 'Failed to update profile. Please try again.',
@@ -203,28 +191,37 @@ const PersonalInformation = () => {
     field: string,
     placeholder: string,
     multiline = false,
-    keyboardType: 'default' | 'email-address' | 'phone-pad' | 'url' = 'default'
+    keyboardType: 'default' | 'email-address' | 'phone-pad' | 'url' = 'default',
+    icon?: keyof typeof Ionicons.glyphMap
   ) => (
-    <View className="mb-4">
-      <Text className="text-sm font-rubik-medium text-gray-700 mb-2">
-        {label}
-      </Text>
+    <View className="mb-5">
+      <View className="mb-3 flex-row items-center">
+        {icon && (
+          <Ionicons name={icon} size={16} color="#64748B" className="mr-2" />
+        )}
+        <Text className="text-sm font-rubik-semibold text-slate-700 ">
+          {label}
+        </Text>
+      </View>
       {isEditing ? (
-        <TextInput
-          className={`border border-gray-300 rounded-lg px-4 py-3 text-gray-900 font-rubik ${
-            multiline ? 'h-20' : 'h-12'
-          } ${formData[field as keyof typeof formData] ? 'bg-green-100' : 'bg-white'}`}
-          value={formData[field as keyof typeof formData]}
-          onChangeText={(value) => handleInputChange(field, value)}
-          placeholder={placeholder}
-          placeholderTextColor="#9CA3AF"
-          multiline={multiline}
-          keyboardType={keyboardType}
-          autoCapitalize="words"
-        />
+        <View className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm overflow-hidden">
+          <TextInput
+            className={`px-5 py-4 text-slate-900 font-rubik text-base ${
+              multiline ? 'h-24' : 'h-14'
+            }`}
+            value={formData[field as keyof typeof formData]}
+            onChangeText={(value) => handleInputChange(field, value)}
+            placeholder={placeholder}
+            placeholderTextColor="#94A3B8"
+            multiline={multiline}
+            keyboardType={keyboardType}
+            autoCapitalize="words"
+            style={{ textAlignVertical: multiline ? 'top' : 'center' }}
+          />
+        </View>
       ) : (
-        <View className="border border-gray-200 rounded-lg px-4 py-3 bg-gray-50">
-          <Text className="text-gray-900 font-rubik">
+        <View className="bg-white rounded-2xl px-5 py-4 border border-slate-200 shadow-sm">
+          <Text className="text-slate-900 font-rubik text-base">
             {formData[field as keyof typeof formData] ||
               `No ${label.toLowerCase()} provided`}
           </Text>
@@ -235,83 +232,161 @@ const PersonalInformation = () => {
 
   if (!user) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center">
-        <Text className="text-gray-500">Loading user information...</Text>
+      <SafeAreaView className="flex-1 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 items-center justify-center">
+        <View className="bg-white rounded-3xl p-8 shadow-lg">
+          <ActivityIndicator size="large" color="#6366F1" />
+          <Text className="text-slate-600 font-rubik-medium mt-4 text-center">
+            Loading your profile...
+          </Text>
+        </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
       >
-        {/* Header */}
-        <View className="flex-row items-center justify-between px-6 py-4 border-b border-gray-200">
-          <Pressable onPress={() => router.back()} className="p-2">
-            <Ionicons name="arrow-back" size={24} color="#374151" />
-          </Pressable>
-          <Text className="text-xl font-rubik-bold text-gray-900">
-            Personal Information
-          </Text>
-          <View className="w-10" />
+        {/* Modern Header */}
+        <View className="bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-sm">
+          <View className="flex-row items-center justify-between px-6 py-5">
+            <TouchableOpacity
+              onPress={() => router.back()}
+              className="w-12 h-12 bg-slate-100 rounded-2xl items-center justify-center shadow-sm"
+            >
+              <Ionicons name="arrow-back" size={22} color="#475569" />
+            </TouchableOpacity>
+            <View className="flex-1 items-center">
+              <Text className="text-xl font-rubik-bold text-slate-900">
+                Personal Information
+              </Text>
+              <Text className="text-sm text-slate-500 font-rubik mt-1">
+                {user.userType === 'applicant' ? 'Job Seeker' : 'Recruiter'}{' '}
+                Profile
+              </Text>
+            </View>
+            <View className="w-12" />
+          </View>
         </View>
 
         <ScrollView
           className="flex-1 px-6 py-6"
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
         >
-          {/* Basic Information */}
-          <View className="mb-6">
-            <View className='flex items-center justify-between flex-row mb-4'>
-              <Text className="text-lg font-rubik-bold text-gray-900 mb-4">
+          {/* Profile Header Card */}
+          <View className="bg-white rounded-3xl p-6 mb-6 shadow-lg border border-white/50">
+            <View className="items-center mb-4">
+              <View className="w-20 h-20 bg-black-100/10 rounded-full items-center justify-center shadow-lg mb-3">
+                <Text className="text-black-100 font-rubik-bold text-2xl">
+                  {formData.firstName?.[0]?.toUpperCase() ||
+                    user.email?.[0]?.toUpperCase() ||
+                    'U'}
+                </Text>
+              </View>
+              <Text className="text-xl font-rubik-bold text-slate-900 text-center">
+                {formData.firstName && formData.lastName
+                  ? `${formData.firstName} ${formData.lastName}`
+                  : user.email}
+              </Text>
+              <Text className="text-slate-500 font-rubik-medium text-center">
+                {user.userType === 'applicant' ? 'Job Seeker' : 'Recruiter'}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              onPress={() => setIsEditing(!isEditing)}
+              className={`w-full py-4 rounded-2xl items-center shadow-lg ${
+                isEditing
+                  ? 'bg-red-500'
+                  : 'bg-blue-500'
+              }`}
+            >
+              <Text className="text-white font-rubik-bold text-base">
+                {isEditing ? 'Cancel Editing' : 'Edit Profile'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Basic Information Section */}
+          <View className="bg-white rounded-3xl p-6 mb-6 shadow-lg border border-white/50">
+            <View className="flex-row items-center mb-6">
+              <Text className="text-lg font-rubik-bold text-slate-900">
                 Basic Information
               </Text>
-              <TouchableOpacity
-                className="flex bg-blue-500/70 rounded-full py-1 px-4 items-center"
-                onPress={() => setIsEditing(true)}
-              >
-                <Text className="text-white font-rubik-medium">
-                  Edit Profile
-                </Text>
-              </TouchableOpacity>
             </View>
-            {renderField('First Name', 'firstName', 'Enter your first name')}
-            {renderField('Last Name', 'lastName', 'Enter your last name')}
+
+            {renderField(
+              'First Name',
+              'firstName',
+              'Enter your first name',
+              false,
+              'default',
+              'person'
+            )}
+            {renderField(
+              'Last Name',
+              'lastName',
+              'Enter your last name',
+              false,
+              'default',
+              'person'
+            )}
             {renderField(
               'Phone',
               'phone',
               'Enter your phone number',
               false,
-              'phone-pad'
+              'phone-pad',
+              'call'
             )}
-            <View className="mb-4">
-              <Text className="text-sm font-rubik-medium text-gray-700 mb-2">
-                Email
-              </Text>
-              <View className="border border-gray-200 rounded-lg px-4 py-3 bg-gray-50">
-                <Text className="text-gray-900 font-rubik">{user.email}</Text>
+
+            <View className="mb-5">
+              <View className="mb-3 flex-row items-center">
+                <Ionicons
+                  name="mail"
+                  size={16}
+                  color="#64748B"
+                  className="mr-2"
+                />
+                <Text className="text-sm font-rubik-semibold text-slate-700 ">
+                  Email Address
+                </Text>
+              </View>
+              <View className="bg-white rounded-2xl px-5 py-4 border border-slate-200 shadow-sm">
+                <Text className="text-slate-900 font-rubik text-base">
+                  {user.email}
+                </Text>
               </View>
             </View>
           </View>
 
           {/* Applicant Specific Fields */}
           {user.userType === 'applicant' && (
-            <View className="mb-6">
-              <Text className="text-lg font-rubik-bold text-gray-900 mb-4">
-                Professional Information
-              </Text>
-              <View className="mb-4">
-                <Text className="text-sm font-rubik-medium text-gray-700 mb-2">
+            <View className="bg-white rounded-3xl p-6 mb-6 shadow-lg border border-white/50">
+              <View className="flex-row items-center mb-6">
+                <Text className="text-lg font-rubik-bold text-slate-900">
+                  Professional Information
+                </Text>
+              </View>
+
+              <View className="mb-5">
+                <Text className="text-sm font-rubik-semibold text-slate-700 mb-3 flex-row items-center">
+                  <Ionicons
+                    name="location"
+                    size={16}
+                    color="#64748B"
+                    className="mr-2"
+                  />
                   Location
                 </Text>
                 {isEditing ? (
-                  <View className="bg-gray-50 rounded-xl px-3 py-3">
-                    {/* Country Picker */}
-                    <View className="flex-row items-center mb-2">
-                      <Ionicons name="location" size={20} color="#6366F1" />
-                      <Text className="ml-2 text-gray-700 font-rubik">
+                  <View className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm p-4">
+                    <View className="flex-row items-center mb-3">
+                      <Ionicons name="earth" size={20} color="#6366F1" />
+                      <Text className="ml-3 text-slate-700 font-rubik-medium">
                         Select Country
                       </Text>
                     </View>
@@ -329,32 +404,45 @@ const PersonalInformation = () => {
                       }}
                     />
 
-                    {/* City Dropdown */}
                     {country && (
                       <View className="mt-4">
-                        <Text className="text-gray-700 font-rubik mb-2">
+                        <Text className="text-slate-700 font-rubik-medium mb-2">
                           Select City
                         </Text>
                         {loadingCities ? (
-                          <ActivityIndicator color="#6366F1" size="small" />
+                          <View className="items-center py-4">
+                            <ActivityIndicator color="#6366F1" size="small" />
+                          </View>
                         ) : (
                           <Dropdown
                             style={{
-                              backgroundColor: '#fff',
-                              borderRadius: 12,
-                              padding: 10,
-                              borderWidth: 1,
-                              borderColor: '#E5E7EB',
+                              backgroundColor: '#F8FAFC',
+                              borderRadius: 16,
+                              padding: 12,
+                              borderWidth: 2,
+                              borderColor: '#E2E8F0',
+                              shadowColor: '#000',
+                              shadowOffset: { width: 0, height: 2 },
+                              shadowOpacity: 0.1,
+                              shadowRadius: 4,
+                              elevation: 3,
                             }}
-                            placeholderStyle={{ color: '#9CA3AF' }}
-                            selectedTextStyle={{ color: '#4F46E5' }}
+                            placeholderStyle={{
+                              color: '#94A3B8',
+                              fontSize: 16,
+                            }}
+                            selectedTextStyle={{
+                              color: '#334155',
+                              fontSize: 16,
+                              fontWeight: '600',
+                            }}
                             data={cities}
                             labelField="label"
                             valueField="value"
-                            placeholder="Choose City"
+                            placeholder="Choose your city"
                             value={city}
                             search
-                            searchPlaceholder="Search city..."
+                            searchPlaceholder="Search cities..."
                             onChange={(item: any) => setCity(item.value)}
                           />
                         )}
@@ -362,93 +450,127 @@ const PersonalInformation = () => {
                     )}
                   </View>
                 ) : (
-                  <View className="border border-gray-200 rounded-lg px-4 py-3 bg-gray-50">
-                    <Text className="text-gray-900 font-rubik">
+                  <View className="bg-white rounded-2xl px-5 py-4 border border-slate-200 shadow-sm">
+                    <Text className="text-slate-900 font-rubik text-base">
                       {formData.location || 'No location provided'}
                     </Text>
                   </View>
                 )}
               </View>
-              <View className="mb-4">
-                <Text className="text-sm font-rubik-medium text-gray-700 mb-2">
+
+              <View className="mb-5">
+                <Text className="text-sm font-rubik-semibold text-slate-700 mb-3 flex-row items-center">
+                  <Ionicons
+                    name="document"
+                    size={16}
+                    color="#64748B"
+                    className="mr-2"
+                  />
                   Resume
                 </Text>
                 {isEditing ? (
-                  <View className="bg-gray-50 rounded-xl px-3 py-3">
+                  <View className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm p-4">
                     <TextInput
-                      className={`border border-gray-300 rounded-lg px-4 py-3 text-gray-900 font-rubik h-12 mb-2 ${formData.resume ? 'bg-green-100' : 'bg-white'}`}
+                      className="px-4 py-3 text-slate-900 font-rubik text-base h-14 bg-slate-50 rounded-xl mb-3"
                       value={formData.resume}
                       onChangeText={(value) =>
                         handleInputChange('resume', value)
                       }
                       placeholder="Enter resume URL or upload file"
-                      placeholderTextColor="#9CA3AF"
+                      placeholderTextColor="#94A3B8"
                       keyboardType="url"
                       autoCapitalize="none"
                     />
                     <TouchableOpacity
-                      className="bg-blue-600 rounded-lg py-3 items-center"
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl py-4 items-center shadow-lg"
                       onPress={() => {
-                        // TODO: Implement file picker
                         setToast({
                           visible: true,
-                          message: 'File picker not implemented yet',
+                          message: 'File picker coming soon!',
                           type: 'info',
                         });
                       }}
                     >
-                      <Text className="text-white font-rubik-medium">
-                        Upload Resume File
-                      </Text>
+                      <View className="flex-row items-center">
+                        <Ionicons name="cloud-upload" size={20} color="white" />
+                        <Text className="text-white font-rubik-bold text-base ml-2">
+                          Upload Resume File
+                        </Text>
+                      </View>
                     </TouchableOpacity>
                   </View>
                 ) : (
-                  <View className="border border-gray-200 rounded-lg px-4 py-3 bg-gray-50">
-                    <Text className="text-gray-900 font-rubik">
+                  <View className="bg-white rounded-2xl px-5 py-4 border border-slate-200 shadow-sm">
+                    <Text className="text-slate-900 font-rubik text-base">
                       {formData.resume || 'No resume provided'}
                     </Text>
                   </View>
                 )}
               </View>
-              <View className="mb-4">
-                <Text className="text-sm font-rubik-medium text-gray-700 mb-2">
+
+              <View className="mb-5">
+                <Text className="text-sm font-rubik-semibold text-slate-700 mb-3 flex-row items-center">
+                  <Ionicons
+                    name="code"
+                    size={16}
+                    color="#64748B"
+                    className="mr-2"
+                  />
                   Skills
                 </Text>
                 {isEditing ? (
-                  <View className="bg-gray-50 rounded-xl px-3 py-3">
+                  <View className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm p-4">
                     <Dropdown
                       style={{
-                        backgroundColor: '#fff',
-                        borderRadius: 12,
-                        padding: 10,
-                        borderWidth: 1,
-                        borderColor: '#E5E7EB',
+                        backgroundColor: '#F8FAFC',
+                        borderRadius: 16,
+                        padding: 12,
+                        borderWidth: 2,
+                        borderColor: '#E2E8F0',
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 4,
+                        elevation: 3,
                       }}
-                      placeholderStyle={{ color: '#9CA3AF' }}
-                      selectedTextStyle={{ color: '#4F46E5' }}
+                      placeholderStyle={{ color: '#94A3B8', fontSize: 16 }}
+                      selectedTextStyle={{
+                        color: '#334155',
+                        fontSize: 16,
+                        fontWeight: '600',
+                      }}
                       data={skillsList}
                       labelField="label"
                       valueField="value"
-                      placeholder="Select Skills"
-                      value={selectedSkills.map((s) => s.value)}
+                      placeholder="Select your skills"
+                      value={
+                        selectedSkills.length > 0
+                          ? selectedSkills[selectedSkills.length - 1].value
+                          : null
+                      }
                       search
                       searchPlaceholder="Search skills..."
                       onChange={(item: any) => {
-                        const exists = selectedSkills.find(s => s.value === item.value);
+                        const exists = selectedSkills.find(
+                          (s) => s.value === item.value
+                        );
                         if (exists) {
-                          setSelectedSkills(selectedSkills.filter(s => s.value !== item.value));
+                          setSelectedSkills(
+                            selectedSkills.filter((s) => s.value !== item.value)
+                          );
                         } else {
                           setSelectedSkills([...selectedSkills, item]);
                         }
                       }}
+                      maxHeight={200}
                     />
-                    <Text className="text-gray-700 font-rubik mt-2">
+                    <Text className="text-slate-700 font-rubik mt-3">
                       Selected: {selectedSkills.map((s) => s.label).join(', ')}
                     </Text>
                   </View>
                 ) : (
-                  <View className="border border-gray-200 rounded-lg px-4 py-3 bg-gray-50">
-                    <Text className="text-gray-900 font-rubik">
+                  <View className="bg-white rounded-2xl px-5 py-4 border border-slate-200 shadow-sm">
+                    <Text className="text-slate-900 font-rubik text-base">
                       {formData.skills || 'No skills provided'}
                     </Text>
                   </View>
@@ -459,52 +581,65 @@ const PersonalInformation = () => {
 
           {/* Recruiter Specific Fields */}
           {user.userType === 'recruiter' && (
-            <View className="mb-6">
-              <Text className="text-lg font-rubik-bold text-gray-900 mb-4">
-                Company Information
-              </Text>
-              {renderField('Company Name', 'companyName', 'Enter company name')}
+            <View className="bg-white rounded-3xl p-6 mb-6 shadow-lg border border-white/50">
+              <View className="flex-row items-center mb-6">
+                <Text className="text-lg font-rubik-bold text-slate-900">
+                  Company Information
+                </Text>
+              </View>
+
+              {renderField(
+                'Company Name',
+                'companyName',
+                'Enter company name',
+                false,
+                'default',
+                'business'
+              )}
               {renderField(
                 'Company Website',
                 'companyWebsite',
                 'Enter company website',
                 false,
-                'url'
+                'url',
+                'globe'
               )}
             </View>
           )}
 
           {/* Action Buttons */}
-          <View className="flex-row gap-4 mb-8">
-            {isEditing ? (
-              <>
-                <TouchableOpacity
-                  className="flex-1 bg-blue-600 rounded-lg py-4 items-center"
-                  onPress={handleSave}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <ActivityIndicator color="#FFFFFF" />
-                  ) : (
-                    <Text className="text-white font-rubik-medium">
+          {isEditing && (
+            <View className="flex-row gap-4 mb-8">
+              <TouchableOpacity
+                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl py-4 items-center shadow-lg"
+                onPress={handleSave}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <View className="flex-row items-center">
+                    <Ionicons name="checkmark" size={20} color="#666876" />
+                    <Text className="text-black-200 font-rubik-bold text-base ml-2">
                       Save Changes
                     </Text>
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className="flex-1 bg-gray-300 rounded-lg py-4 items-center"
-                  onPress={() => setIsEditing(false)}
-                  disabled={loading}
-                >
-                  <Text className="text-gray-700 font-rubik-medium">
+                  </View>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="flex-1 bg-gradient-to-r from-slate-400 to-slate-500 rounded-2xl py-4 items-center shadow-lg"
+                onPress={() => setIsEditing(false)}
+                disabled={loading}
+              >
+                <View className="flex-row items-center">
+                  <Ionicons name="close" size={20} color="#F75555" />
+                  <Text className="text-danger font-rubik-bold text-base ml-2">
                     Cancel
                   </Text>
-                </TouchableOpacity>
-              </>
-            ) : (
-              ''
-            )}
-          </View>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
 
