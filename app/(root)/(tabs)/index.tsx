@@ -281,38 +281,35 @@ export default function Index() {
       : applicantQuickActions;
 
   return (
-    <SafeAreaView className="h-full pb-14">
+    <SafeAreaView className="flex-1 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View className="bg-white px-6 py-4 border-b border-gray-200">
-          <View className="flex-row justify-between items-center">
-            <View>
-              <Text className="text-2xl font-rubik-bold text-gray-900">
+        {/* Modern Header */}
+        <View className="bg-white/80 backdrop-blur-lg border-b border-white/20">
+          <View className="flex-row justify-between items-center px-6 py-6">
+            <View className="flex-1">
+              <Text className="text-2xl font-rubik-bold text-slate-900">
                 Welcome back,
               </Text>
-              <Text className="text-lg font-rubik text-gray-600">
+              <Text className="text-lg font-rubik text-slate-600">
                 {user?.name || 'Ayonitemi!'}
               </Text>
             </View>
-            {/* {user?.profile.avatar ? (
-              <Image
-                source={{ uri: user?.profile.avatar }}
-                className="w-12 h-12 border border-gray-100 bg-gray-50 rounded-full"
-                resizeMode="contain"
-              />
-            ) : (
-              <View className="bg-gray-100 p-2 rounded-full">
-                <Ionicons name="person" size={25} color="#374151" />
-              </View>
-            )} */}
+            <View className="w-12 h-12 bg-slate-100 rounded-2xl items-center justify-center">
+              <Ionicons name="person" size={24} color="#475569" />
+            </View>
           </View>
         </View>
 
         {/* Quick Actions */}
         <View className="px-6 py-6">
-          <Text className="text-xl font-rubik-bold text-gray-900 mb-4">
-            Quick Access
-          </Text>
+          <View className="flex-row items-center mb-6">
+            <View className="w-10 h-10 bg-blue-600 rounded-2xl items-center justify-center mr-3">
+              <Ionicons name="flash" size={20} color="white" />
+            </View>
+            <Text className="text-xl font-rubik-bold text-slate-900">
+              Quick Access
+            </Text>
+          </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -434,7 +431,7 @@ export default function Index() {
         )}
 
         {/* Recent Activity */}
-        <View className="px-6 py-6">
+        <View className="px-6 py-6 mb-14">
           <Text className="text-xl font-rubik-bold text-gray-900 mb-4">
             Recent Activity
           </Text>

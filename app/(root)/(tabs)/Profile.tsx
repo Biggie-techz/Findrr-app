@@ -290,7 +290,7 @@ export default function Profile() {
 
           {/* Logout Button */}
           <TouchableOpacity
-            className="bg-gradient-to-r from-red-500 to-pink-600 rounded-3xl p-4 items-center mt-6"
+            className="bg-red-500 rounded-3xl p-4 items-center mt-6"
             onPress={handleLogout}
             disabled={logoutLoading}
           >
@@ -298,14 +298,14 @@ export default function Profile() {
               <ActivityIndicator color="#FFFFFF" />
             ) : (
               <View className="flex-row items-center">
-                <Ionicons name="log-out" size={20} color="white" />
+                <Ionicons name="log-out-outline" size={20} color="white" />
                 <Text className="text-white font-rubik-bold text-base ml-2">Sign Out</Text>
               </View>
             )}
           </TouchableOpacity>
 
           {/* App Version */}
-          <Text className="text-center text-slate-400 text-sm font-rubik mt-8">
+          <Text className="text-center text-slate-400 text-sm font-rubik mt-8 mb-14">
             Findrr v1.0.0
           </Text>
         </View>

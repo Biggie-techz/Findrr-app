@@ -153,9 +153,9 @@ const PrivacySecuritySettings = () => {
         <View className="flex-row items-center justify-between px-6 py-5">
           <TouchableOpacity
             onPress={() => router.back()}
-            className="w-12 h-12 bg-slate-100 rounded-2xl items-center justify-center"
+            className="w-12 h-12 rounded-2xl items-center justify-center"
           >
-            <Ionicons name="arrow-back" size={22} color="#475569" />
+            <Ionicons name="chevron-back" size={22} color="#475569" />
           </TouchableOpacity>
           <View className="flex-1 items-center">
             <Text className="text-xl font-rubik-bold text-slate-900">
